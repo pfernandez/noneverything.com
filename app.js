@@ -25,6 +25,9 @@ app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// show directory listings
+app.use(express.directory(__dirname + '/public'));
+
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
