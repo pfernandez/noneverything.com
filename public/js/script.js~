@@ -77,7 +77,7 @@ $(".post-button").click(function(event) {
 window.onpopstate = function() {
 	displayPost(location.href); //breaks chromium 
 }
-displayPost(location.href); //reqd on intial page load in FF, causes duplicate in chrome :(
+displayPost(location.href); //reqd on intial page load in FF
 
 /*
  * Display contents of a file as a post.

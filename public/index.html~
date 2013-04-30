@@ -14,7 +14,11 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
     
-<body>
+<body onunload=""><!-- This does the trick -->
+<script type="text/javascript">
+    alert('first load / reload');
+    window.onload = function(){alert('onload')};
+</script>
     
     <div id="header">
 		<div class="set-width">

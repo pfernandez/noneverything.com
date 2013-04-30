@@ -11,7 +11,7 @@
       			paused = false;
     		}
 			var fileRequest = new window.XMLHttpRequest();
-			fileRequest.open("GET", pdeFile, false);
+			fileRequest.open("GET", pdeFile + "?foo=bar", false);
       		fileRequest.send(null);
       		var canvas = $("#sketchCanvas").get(0);
 			p = new Processing(canvas, fileRequest.responseText);
@@ -26,6 +26,14 @@
 <style>
 	#warning {
 		font-weight: bold;
+	}
+	#over {
+	    display: inline-block;
+	    padding: 0 1em 2em 1.5em;
+	}
+	#over, .sidebar, #header {
+		background: rgba(255, 255, 255, 0.75);
+		border-radius: 5px;
 	}
 	#under {
 		top: 0%;
@@ -56,7 +64,7 @@
 	}
 	.listBlock {
 		float:left;
-		margin: 0 1em;
+		margin: 0 1.5em;
 	}
 </style>
 

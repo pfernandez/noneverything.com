@@ -1,5 +1,5 @@
 <h2>Auditory Multiplication Table</h2>
-<div style="max-width:100%">
+<div class="centered-block" style="max-width:100%">
 	<object type="application/x-shockwave-flash" data="posts/tone-table/tone-table.swf" width="680" height="640" style="background: none; box-shadow: none;">
 		<param name="movie" value="posts/tone-table/tone-table.swf" />
 		<param name="quality" value="high" />

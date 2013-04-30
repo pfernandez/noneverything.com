@@ -66,7 +66,7 @@ app.get('*', function(req, res) {
     var is_html = (mime.lookup(req.path).indexOf('html') !== -1);
 
     if(! is_html || is_ajax_request) {
-        res.sendfile(__dirname + '/public' + req.path);
+        res.sendfile(__dirname + '/public' + req.originalUrl);
     }
     else
         res.sendfile(__dirname + '/public/index.html');
