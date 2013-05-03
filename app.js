@@ -1,71 +1,62 @@
-/**
- * Module dependencies.
 
 
-// Load module dependencies.
-var express = require('express');
-var http    = require('http');
-var path    = require('path');
+// Module dependencies.
+var express = require('express'),
+	http    = require('http'),
+    path    = require('path'),
+    mime    = require('mime');
 
-// Innstantiate the app.
-var app = express();
-
-// Set up the environment.
-app.set('port', process.env.PORT || 3000);
-app.use(express.favicon());
-app.use(express.logger('dev'));
-app.use(express.bodyParser());
-app.use(express.static(path.join(__dirname, 'public')));  // use static files in 'public/'
-//app.use(express.directory(__dirname + '/public'));  // show directory listings 
-
-// Handle errors depending on mode: 'development' or 'production'.
-if ('development' == app.get('env')) {
-    app.use(express.errorHandler());
-}
-
-
-function serveIndex(req, res) {
-    res.sendfile(path.join(__dirname, 'public/index.html'));
-}
-app.get('*', serveIndex);
-app.post('*', serveIndex);
-
-
-http.createServer(app).listen(app.get('port'), function() {
-    console.log('Express server listening on port ' + app.get('port')
-        + ' in ' + app.get('env') + ' mode.');
-}); */
-
-
-/**
- * Module dependencies.
- */
-
-var express = require('express')
-  , http = require('http')
-  , path = require('path')
-  , mime = require('mime');
 
 var app = express();
 
-// all environments
+
+// Set the port to listen at.
 app.set('port', process.env.PORT || 3000);
+
+
+// Include standard modules.
 app.use(express.favicon());
 app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(app.router);
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.directory(__dirname + '/public'));  // show directory listings 
+
+app.use(function(err, req, res, next){
+	console.error(err.stack);
+	var is_ajax_request = req.xhr;
+    var is_html = (mime.lookup(req.path).indexOf('html') !== -1);
+
+    res.writeHead(301, {'Location':'/', 'Expires': (new Date).toGMTString()});
+    res.end();
+});
 
 
-// Show index.html unless we have an ajax request.
+// Settings for development mode.
+if ('development' == app.get('env')) {
+	app.use(express.errorHandler());
+	var hourMs = 0; // static files cache duration
+}
+else {
+	var hourMs = 1000*60*60;
+}
+
+
+// Use static files in the public/ directory.
+app.use(express.static(__dirname + '/public', { maxAge: hourMs }));
+
+
+// Show directory listings.
+app.use(express.directory(__dirname + '/public'));
+
+
+// Show index.html unless we have an ajax request or the requested
+// resource is something other than html.
 app.get('*', function(req, res) {
 
     var is_ajax_request = req.xhr;
     var is_html = (mime.lookup(req.path).indexOf('html') !== -1);
 
-    if(! is_html || is_ajax_request) {
+    if(!is_html || is_ajax_request) {
         res.sendfile(__dirname + '/public' + req.path);
     }
     else
@@ -73,11 +64,7 @@ app.get('*', function(req, res) {
 });
 
 
-// development only
-if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
-}
-
+// Start the server.
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });

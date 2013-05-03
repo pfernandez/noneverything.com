@@ -5,22 +5,6 @@ $(document).ready(function() {
 
 
 /*
- * Display the menu contents listed in menu.txt.
- *
-$.get("menu.txt", function(data) {
-
-    var lines = data.split("\n");
-
-    $.each(lines, function(n, elem) {
-       console.log("<dd>" + elem + "</dd>");
-      // $('#myContainer').append('<div>' + elem + '</div>');
-    });
-    
-});
-*/
-
-
-/*
  * Trigger actions when the browser window is resized.
  */
 $(window).resize(function() {
@@ -47,7 +31,7 @@ function slideMenu() {
         list.hide();
         
         // Add the "Contents" element.
-        contentsButton = document.createElement("h2");
+        var contentsButton = document.createElement("h2");
         $(contentsButton).addClass("contents").text("Contents");
         sidebar.prepend(contentsButton);
         
@@ -62,11 +46,11 @@ slideMenu();
 /*
  * Display post and change url when an item is clicked.
  */
-$(".post-button").click(function(event) {
+$("a.post-button").click(function(event) {
     event.preventDefault();
 	var href = $(this).attr("href");
 	window.history.pushState(null, $(this).text(), href);
-	displayPost(href);
+	displayPost();
 	getDirectoryListing(href);
 });
 
@@ -75,42 +59,67 @@ $(".post-button").click(function(event) {
  * Load post corresponding to address bar.
  */
 window.onpopstate = function() {
-	displayPost(location.href); //breaks chromium 
+	displayPost();
 }
-displayPost(location.href); //reqd on intial page load in FF, causes duplicate in chrome :(
+//displayPost(window.location.pathname); //reqd on intial page load in FF, causes duplicate in chrome :(
 
 /*
  * Display contents of a file as a post.
  *
  * string: "path/to/filename"
  */
-function displayPost(href) {
+function displayPost() {
 
-    if(window.location.pathname == "/")
-        href = "/posts/visual-synth/visual-synth.html";
-        
-	$.get(href, function(data) {
-	    $("#post").fadeOut(200, 0.0, function() {
-            $("#post").html(data);
-            $("#post").fadeIn();
-        });
-    });
+	var path = window.location.pathname;
+	console.log(path);
+	
+    if(path == "/")
+		path = "posts/hello.html";
+		
+	$("#post").fadeOut(200, 0.0, function() {
+		$(this).load(path+'?_ajax=1', function(response, status, xhr) {
+		
+			if (status == "error") {
+				var msg = "Sorry but there was an error: ";
+				console.log(msg + xhr.status + " " + xhr.statusText);
+			}
+			else {
+				$(this).fadeIn().find("a img").click(function(event) {
+
+					// This is the point at which I should be creating a PostContent
+					// object, then using a constructor instead of all of these
+					// chained functions.
+
+					enlargeImage(event, this);
+				});
+			}
+		});
+	});
 }
 
 
-/*
- * Display Branch discussion related to visible post.
- * Be sure to include the data-branch-embedid from Branch embed script
- * as an attribute of the posts sidebar link.
+function enlargeImage(event, element) {
+	
+	event.preventDefault();
+	$(element)
+		.animate({"max-width": ($(document).width() * .7) + "px"}, 500)
+		.unbind("click")
+		.click(function(event) {
+			shrinkImage(event, element);
+		});
+}
 
-function displayBranchComments(id) {
-	$("#branch").empty();
-	var script = document.createElement( "script" );
-	script.type = "text/javascript";
-	script.src = "http://embed-script.branch.com/assets/embed/embed.m.js?body=0";
-	script.setAttribute("data-branch-embedid", $("#"+id).attr("data-branch-embedid"));
-	document.getElementById("branch").appendChild(script);
-} */
+
+function shrinkImage(event, element) {
+	
+	event.preventDefault();
+	$(element)
+		.animate({"max-width": "100%"}, 500)
+		.unbind("click")
+		.click(function(event) {
+			enlargeImage(event, element);
+		});
+}
 
 
 function getDirectoryListing(href) {
@@ -135,6 +144,21 @@ function getDirectoryListing(href) {
         }
     });
 }
+
+
+/*
+ * Display Branch discussion related to visible post.
+ * Be sure to include the data-branch-embedid from Branch embed script
+ * as an attribute of the posts sidebar link.
+
+function displayBranchComments(id) {
+	$("#branch").empty();
+	var script = document.createElement( "script" );
+	script.type = "text/javascript";
+	script.src = "http://embed-script.branch.com/assets/embed/embed.m.js?body=0";
+	script.setAttribute("data-branch-embedid", $("#"+id).attr("data-branch-embedid"));
+	document.getElementById("branch").appendChild(script);
+} */
 
 
 });

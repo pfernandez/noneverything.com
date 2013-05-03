@@ -162,7 +162,6 @@ pre {
 
 .img-enlarged:after {
 	content: "close";
-	color: #000;
 	background: #fff;
 }
 
